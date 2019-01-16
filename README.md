@@ -19,3 +19,7 @@ The reactor design pattern is an event handling pattern for handling service req
   Sender
   NetworkClient
 3. Kafka Client
+4. https://github.com/openpreserve/pagelyzer
+
+https://github.com/edgi-govdata-archiving/awesome-website-change-monitoring/blob/master/readme.md
+

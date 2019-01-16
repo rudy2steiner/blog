@@ -23,3 +23,35 @@ The reactor design pattern is an event handling pattern for handling service req
 
 https://github.com/edgi-govdata-archiving/awesome-website-change-monitoring/blob/master/readme.md
 
+5. kafka producer
+
+ ProdcuerRecord<K,V>
+ key 路由字段
+ value body
+
+6. Kafka Metadata
+异步请求
+maybeUpdate
+poll 中更新
+
+7. Sender 后台发送线程|单线程发送
+{
+  KafkaClient(NetworkClient)
+  accumulator(RecordAccumulator)
+  sendProduceRequest
+}
+8. ApiKeys
+  Type
+
+AbstractRequest
+9. NetworkClient/MetadataRequest
+  Schema
+  Field
+  Struct
+  serilize
+  leadLoadNode
+  DefaultMetadataUpdater
+  NetworkSend
+  inFlightRequests
+10. PRODUCE流程
+  ReadyCheckResult

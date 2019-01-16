@@ -43,8 +43,9 @@ poll 中更新
 8. ApiKeys
   Type
 
-AbstractRequest
-9. NetworkClient/MetadataRequest
+9. AbstractRequest
+10. NetworkClient/MetadataRequest
+
   Schema
   Field
   Struct
@@ -53,5 +54,6 @@ AbstractRequest
   DefaultMetadataUpdater
   NetworkSend
   inFlightRequests
-10. PRODUCE流程
+
+11. PRODUCE流程
   ReadyCheckResult

@@ -58,3 +58,12 @@ poll 中更新
 11. PRODUCE流程
   ReadyCheckResult
 12. 2PC &BASE transaction  
+13. Kafka server
+   KafkaApi handle
+   Kafka acks
+   Replicas 
+   appendToLocalLog
+   Partition   
+   recvRegisterHandler
+   ISR 
+   Log

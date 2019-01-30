@@ -67,3 +67,5 @@ poll 中更新
    recvRegisterHandler
    ISR 
    Log
+14. kafka isr(in-sync replicas)/failover
+15. kafka benchmark boundary(large scale parition)

@@ -70,4 +70,4 @@ poll 中更新
 14. kafka isr(in-sync replicas)/failover
 15. kafka benchmark boundary(large scale parition)
 16. annotation 总结下
-17. git reset&revert 
+17. git reset&revert  https://es.atlassian.com/git/tutorials/undoing-changes/git-revert

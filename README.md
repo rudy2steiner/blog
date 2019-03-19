@@ -73,3 +73,4 @@ poll 中更新
 17. git reset&revert  https://es.atlassian.com/git/tutorials/undoing-changes/git-revert
 18. https://github.com/jitsi/jitsi
 19. two-phase transaction  and recovery
+ - http://web.cs.iastate.edu/~cs554/NOTES/Ch8-4.pdf

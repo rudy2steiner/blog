@@ -72,3 +72,4 @@ poll 中更新
 16. annotation 总结下
 17. git reset&revert  https://es.atlassian.com/git/tutorials/undoing-changes/git-revert
 18. https://github.com/jitsi/jitsi
+19. two-phase transaction  and recovery

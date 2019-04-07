@@ -76,3 +76,4 @@ poll 中更新
  - http://web.cs.iastate.edu/~cs554/NOTES/Ch8-4.pdf
 20. AbstractProcessor 
 21. BeanPostProcessor 
+22. 字典压缩算法LZ4

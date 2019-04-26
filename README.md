@@ -77,3 +77,5 @@ poll 中更新
 20. AbstractProcessor 
 21. BeanPostProcessor 
 22. 字典压缩算法LZ4
+23. HTTP 1.1 
+https://tools.ietf.org/html/draft-ietf-httpbis-p2-semantics-16#section-7.5

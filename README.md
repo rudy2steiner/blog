@@ -79,3 +79,4 @@ poll 中更新
 22. 字典压缩算法LZ4
 23. HTTP 1.1 
 https://tools.ietf.org/html/draft-ietf-httpbis-p2-semantics-16#section-7.5
+24. ubuntu shadowsocks and terminal https://www.jianshu.com/p/48b3866b5e2a 

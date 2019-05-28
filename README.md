@@ -72,3 +72,14 @@ poll 中更新
 16. annotation 总结下
 17. git reset&revert  https://es.atlassian.com/git/tutorials/undoing-changes/git-revert
 18. https://github.com/jitsi/jitsi
+19. two-phase transaction  and recovery
+ - http://web.cs.iastate.edu/~cs554/NOTES/Ch8-4.pdf
+20. AbstractProcessor 
+21. BeanPostProcessor 
+22. 字典压缩算法LZ4
+23. HTTP 1.1 
+https://tools.ietf.org/html/draft-ietf-httpbis-p2-semantics-16#section-7.5
+24. ubuntu shadowsocks and terminal https://www.jianshu.com/p/48b3866b5e2a 
+25. Linkerd RPC loadbalance
+https://blog.linkerd.io/2016/03/16/beyond-round-robin-load-balancing-for-latency/#_ga=2.255177408.933373521.1558319908-1625069959.1558319908
+26. Nvme&SSD 

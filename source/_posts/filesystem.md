@@ -113,4 +113,3 @@ tags: [linux,filesystem,博客翻译]
    &ensp;&ensp;如果你有任何问题，请将它们添加到下面的评论中，我会尝试去回答它们。
 
 原文地址:[An introduction to Linux filesystems](https://opensource.com/life/16/10/introduction-linux-filesystems)
-   

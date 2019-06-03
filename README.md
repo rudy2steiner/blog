@@ -83,3 +83,5 @@ https://tools.ietf.org/html/draft-ietf-httpbis-p2-semantics-16#section-7.5
 25. Linkerd RPC loadbalance
 https://blog.linkerd.io/2016/03/16/beyond-round-robin-load-balancing-for-latency/#_ga=2.255177408.933373521.1558319908-1625069959.1558319908
 26. Nvme&SSD 
+27. Design Pattern
+* Factory

@@ -85,3 +85,5 @@ https://blog.linkerd.io/2016/03/16/beyond-round-robin-load-balancing-for-latency
 26. Nvme&SSD 
 27. Design Pattern
 * Factory
+28. Megastore、paxos、chubby、Quorum机制、bigtable
+分布式存储、复制

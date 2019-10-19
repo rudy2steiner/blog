@@ -27,7 +27,7 @@ Java 对象的实例化JVM都做了那些事情？在日常编写Java项目的�
 6 创建Java 镜像类,并初始化静态成员变量
 
 
-``` C++
+```c++
 instanceKlassHandle ClassFileParser::parseClassFile(Symbol* name,
                                                 ClassLoaderData* loader_data,
                                                 Handle protection_domain,
@@ -114,7 +114,7 @@ instanceKlassHandle ClassFileParser::parseClassFile(Symbol* name,
 
 vmSymbols.h 头文件包含object_initializer_name：
 
-```
+```c++
 
   /* common method and field names */           
   template(object_initializer_name,                "<init>")  
@@ -124,7 +124,7 @@ vmSymbols.h 头文件包含object_initializer_name：
 
 jvm.cpp
 
-```
+```c++
   JVM_AllocateNewObject(JNIEnv *env,
                         jobject receiver,
                         jclass currClass,

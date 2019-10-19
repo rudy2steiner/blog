@@ -87,3 +87,7 @@ https://blog.linkerd.io/2016/03/16/beyond-round-robin-load-balancing-for-latency
 * Factory
 28. Megastore、paxos、chubby、Quorum机制、bigtable
 分布式存储、复制
+29. ReentrantLock& Condition
+30. zookeeper ZAB 和fast PAXOS
+31. http://alvaro-videla.com/2015/12/learning-about-distributed-systems.html
+32. https://github.com/ty4z2008/Qix/blob/master/ds.md

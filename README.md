@@ -1,11 +1,5 @@
-# blog
-###### Java Thread 调度
-###### Reactor
-The reactor design pattern is an event handling pattern for handling service requests delivered concurrently to a service handler by one or more inputs.<br/>
-反应器设计模式是能够将一个或者多个服务请求并发地派发给服务处理器的事件处理模式
-###### JMX(java management extensions)
-###### Spring
-###### Kafka consume|producer|client
+# 博客计划
+
 1. ConsumerCoordinator
  fetch|
  update consume position|
@@ -61,28 +55,28 @@ poll 中更新
 13. Kafka server
    KafkaApi handle
    Kafka acks
-   Replicas 
+   Replicas
    appendToLocalLog
    Partition   
    recvRegisterHandler
-   ISR 
+   ISR
    Log
-14. kafka isr(in-sync replicas)/failover
+14. kafka  consume|producer|client|isr(in-sync replicas)/failover
 15. kafka benchmark boundary(large scale parition)
 16. annotation 总结下
 17. git reset&revert  https://es.atlassian.com/git/tutorials/undoing-changes/git-revert
 18. https://github.com/jitsi/jitsi
 19. two-phase transaction  and recovery
  - http://web.cs.iastate.edu/~cs554/NOTES/Ch8-4.pdf
-20. AbstractProcessor 
-21. BeanPostProcessor 
+20. AbstractProcessor
+21. BeanPostProcessor
 22. 字典压缩算法LZ4
-23. HTTP 1.1 
+23. HTTP 1.1
 https://tools.ietf.org/html/draft-ietf-httpbis-p2-semantics-16#section-7.5
-24. ubuntu shadowsocks and terminal https://www.jianshu.com/p/48b3866b5e2a 
+24. ubuntu shadowsocks and terminal https://www.jianshu.com/p/48b3866b5e2a
 25. Linkerd RPC loadbalance
 https://blog.linkerd.io/2016/03/16/beyond-round-robin-load-balancing-for-latency/#_ga=2.255177408.933373521.1558319908-1625069959.1558319908
-26. Nvme&SSD 
+26. Nvme&SSD
 27. Design Pattern
 * Factory
 28. Megastore、paxos、chubby、Quorum机制、bigtable
@@ -91,3 +85,9 @@ https://blog.linkerd.io/2016/03/16/beyond-round-robin-load-balancing-for-latency
 30. zookeeper ZAB 和fast PAXOS
 31. http://alvaro-videla.com/2015/12/learning-about-distributed-systems.html
 32. https://github.com/ty4z2008/Qix/blob/master/ds.md
+33. Java Thread 调度
+ Reactor
+The reactor design pattern is an event handling pattern for handling service requests delivered concurrently to a service handler by one or more inputs.<br/>
+反应器设计模式是能够将一个或者多个服务请求并发地派发给服务处理器的事件处理模式
+34. JMX(java management extensions)
+35. Spring

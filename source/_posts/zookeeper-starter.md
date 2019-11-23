@@ -10,7 +10,7 @@ ZAB协议主要有四个阶段(ZabState)：ELECTION > DISCOVERY > SYNCHRONIZATIO
 * LEADING (leader)
 * OBSERVING (observer)
 
-理解zookeeper的实现主可以顺着集群中节点角色及协议状态的转化过程，梳理出大致的。Zookeeper有单例和集群两种模式,本文主要从实现的角度介绍Zookeeper集群模式的程序入口、选举、崩溃恢复、广播等内容。
+理解zookeeper的实现主可以顺着集群中节点角色及协议状态的转化过程，梳理出大致的。Zookeeper有单例和集群两种模式,本文基于3.5.5版本源码，从实现的角度介绍Zookeeper集群模式的程序入口、选举、崩溃恢复、广播等内容。
 
 ## ZK集群模式（QuorumPeerMain）
 Zookeeper集群模式的入口类是QuorumPeerMain，主要完成两件事：配置解析及节点初始化并启动(QuorumPeer)。梳理配置解析对理解Zookeeper的整体实现有很大的帮助，比如Zookeeper使用了哪几类端口，作用分别是什么？
@@ -57,7 +57,7 @@ ZAB 算法的详细解释不是本文的重点，但只有理解了ZAB算法，�
 1. 向所有的Peer(包括自己)广播消息(ToSend),也即投票，投票就是将自己的Proposal广播，这也是***原子广播***的由来。Proposal包含如下内容:
        - 本节点sid
        - 本节点最大的Propse(提议)的id
-       - 逻辑时钟（logicclock），选举计数器
+       - 逻辑时钟（logicalclock），选举计数器
        - 节点选举状态(初始值LOOKING)
        - Propse的任期(Epoch),每个任期内的Leader对应唯一值
        - 验证配置QuorumVerifier
@@ -73,20 +73,19 @@ ZAB 算法的详细解释不是本文的重点，但只有理解了ZAB算法，�
 
 
 ## 崩溃恢复（数据同步）
-数据同步的目的是为了保证副本状态的一致性，必须满足两个条件：
+崩溃恢复主要关注Leader是如何处理各种异常情况下，数据的同步。数据同步的目的是为了保证副本状态的一致性，必须满足两个性质：
 * 在任意副本上已提交的事务也必须在其余副本提交，通过SNAP和DIFF完成
 * 没有提交的事务应当被废除，保证没有节点提交该事务，通过TRUNC来完成
 
-Leader宕机，选出的新Leader要处理：
-  * commit后，Leader宕机
-  * 未commit，Leader宕机
+必须处理两种异常：
+* Leader在将事务已写入Commit log，未向Follower发起Proposal前宕机，恢复后废除该事务。
+* Leader向Follower发起事务Proposal后宕机，新Leader需保证此事务正常commit。
 
-Zookeeper 是如何区分未提交的事务呢？
-关键字段
-- history
+关键字段:
 - acceptedEpoch: the epoch number of the last NEWEPOCH message accepted
 - currentEpoch: the epoch number of the last NEWLEADER message accepted
-- lastZxid
+- lastProcessedZxid
+- peerLastZxid
 
 一旦某个Peer获得足够的选票，会变成LEADING状态，此时集群节点很快达成共识，其余节点变成FOLLOWING状态。
 ### Leader的lead方法
@@ -104,14 +103,17 @@ Zookeeper 是如何区分未提交的事务呢？
     - Snapshot Thread
     - fastForwardFromEdits
 
-  * 开启Leader连接处理线程，涉及类LearnerHandler处理follower请求/响应。
+  * 开启Leader连接处理线程，涉及类LearnerHandler处理follower请求/响应，方法syncFollower处理SNAP/DIFF/TRUNC。有四种情况：
+    - peerLastZxid > maxCommitedLog: 直接TRUNC
+    - minCommitedLog <peerLastZxid< maxCommitedLog: 利用内存中commited Proposals，DIFF同步或 TRUNC然后，DIFF同步
+    - peerLastZxid < minCommitedLog: 利用事务日志加内存中commited Proposals，DIFF同步或 TRUNC然后，DIFF同步
+    - 利用SNAP同步
 
 ### Follower的followerLeader方法
 
-主要处理逻辑包含在如下两个方法：
-* read packet  
-* process packet
-
+主要处理逻辑在三个方法中：
+* syncWithLeader：崩溃恢复后与Leader同步数据
+* read 和 process packet：原子广播阶段处理Leader事务proposal  
 
 ## 原子广播
 
@@ -119,33 +121,34 @@ Zookeeper 是如何区分未提交的事务呢？
 ### LeaderZookeeperServer处理客户端的请求，采用一系列Processor：
   1. LeaderRequesetProcessor
   2. RrepRequestProcessor: 分配zxid
-  3. ProposalRequestProcessor:包含
-     - SyncProcessorProcessor 写事务日志和快照日志
+  3. ProposalRequestProcessor: 发起事务Proposal
+     - SyncProcessorProcessor 写事务日志、批量提交事务日志、生成快照日志
        事务日志commit时机：
-     - AckRequestProcessor：mock leader vote the proposal
+     - AckRequestProcessor：事务日志persistent后，mock leader vote the proposal
+
      等待follower ack 达到多数之后操作如下：
-     * toBeApplied Queue
+     * toBeApplied:将事务请求添加到toBeApplied队列（已达成大多数，但还未实际执行事务操作）
      * 发送Leader.COMMIT给所有的Followers
      * 并通知observer
-     * 本地commit
 
   4. CommitProcessor
-    * 非事务 commit的request 直接next
-    * 事务操作
+    * 非事务的request直接next processor
+    * 事务操作，提交最早的事务
   5. ToBeAppliedRequestProcessor
   6. FinalRequestProcessor
     * processTxn: apply to dataTree
     * addCommittedProposal
-    * ReplyHeader
+    * 响应客户端的请求
 
 ### FollowerZookeeperServer处理客户端请求，采用一系列Processor:
   1. FollowerRequestProcessor
   2. CommitProcessor
-  3. FinalRequestProcessor
-专门用于处理Leader的事务日志请求
+  3. FinalRequestProcessor 专门用于处理Leader的事务日志请求
   4. SyncRequestProcessor
   5. SendAckRequestProcessor
 
 ## 客户端请求流程
-
 未完，待续
+## Q&A
+1. Zookeeper 是如何区分未提交的事务呢？
+   在Leader写入事务（zxid）日志，在向follower发起Proposal前宕机，正常的followers选出新leader。旧Leader节点恢复之后，发起数据同步，新Leader会发现不包含follower上的lastProcessZxid，Leader会向follower发送TRUNC。

@@ -1,5 +1,5 @@
 ---
-title: Zookeeper源码分析-概述
+title: Zookeeper源码分析
 date: 2019-10-27 22:24:09
 tags: [ZAB,zookeeper]
 ---
@@ -74,18 +74,18 @@ ZAB 算法的详细解释不是本文的重点，但只有理解了ZAB算法，�
 
 ## 崩溃恢复（数据同步）
 崩溃恢复主要关注Leader是如何处理各种异常情况下，数据的同步。数据同步的目的是为了保证副本状态的一致性，必须满足两个性质：
-* 在任意副本上已提交的事务也必须在其余副本提交，通过SNAP和DIFF完成
+* 在任意副本上已提交的事务(lastProcessZxid)也必须在其余副本提交，通过SNAP和DIFF完成
 * 没有提交的事务应当被废除，保证没有节点提交该事务，通过TRUNC来完成
 
-必须处理两种异常：
-* Leader在将事务已写入Commit log，未向Follower发起Proposal前宕机，恢复后废除该事务。
-* Leader向Follower发起事务Proposal后宕机，新Leader需保证此事务正常commit。
+可能的异常情况：
+1. Leader在将事务已写入Commit log，未向Follower发起Proposal前宕机，新Leader会废除该事务
+2. Leader向Follower发起事务Proposal后宕机，但未commit宕机，新Leader会废除该事务
+3. Proposal commit后宕机，并且至少有一个follower成功commit，新Leader会保证提交该事务
 
 关键字段:
 - acceptedEpoch: the epoch number of the last NEWEPOCH message accepted
 - currentEpoch: the epoch number of the last NEWLEADER message accepted
 - lastProcessedZxid
-- peerLastZxid
 
 一旦某个Peer获得足够的选票，会变成LEADING状态，此时集群节点很快达成共识，其余节点变成FOLLOWING状态。
 ### Leader的lead方法
@@ -147,8 +147,6 @@ ZAB 算法的详细解释不是本文的重点，但只有理解了ZAB算法，�
   4. SyncRequestProcessor
   5. SendAckRequestProcessor
 
-## 客户端请求流程
-未完，待续
 ## Q&A
 1. Zookeeper 是如何区分未提交的事务呢？
    在Leader写入事务（zxid）日志，在向follower发起Proposal前宕机，正常的followers选出新leader。旧Leader节点恢复之后，发起数据同步，新Leader会发现不包含follower上的lastProcessZxid，Leader会向follower发送TRUNC。

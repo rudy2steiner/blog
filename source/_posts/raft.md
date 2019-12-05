@@ -4,7 +4,7 @@ date: 2019-12-04 22:52:45
 tags:
 ---
 Raft算法包含如下子问题：
-   - Leader 选举,成员变更
+   - Leader 选举, 两阶段成员变更
    - Log replication，log compact
    - Safety
 
@@ -13,8 +13,9 @@ server state:
   - follower
   - candidate
 
+
+## Raft中主要的对象：
 ```
-Raft中主要的对象：
 Persistent state{
   currentTerm,
   votedFor,
@@ -42,17 +43,17 @@ Vote Request 接受者实现：
  * 如果没有给任何选选者投票且候选者log不落后于自己的日志（），true
 ```
 
-遵循的规则
+## 遵循的规则
 ```
- 所有Servers遵循的规则：
+ Servers遵循的规则：
   * if commitIndex > lastApplied,更新lastApplied并应用日志到状态机
   * if RPC 请求或者响应的 term(T)> currentTerm,更新currentTerm =T，变成follower
 
- Follower遵循的原则：
+Follower遵循的原则：
   * 响应来之候选者和领导者的RPC
   * 没有收到当前Leader AppendEnties或者给候选人投票并超时，则变成候选人
 
- 候选人遵循的规则：
+Candicate遵循的规则：
   * 在和候选人交流和启动选举时，
    - currentTerm自增
    - 投票给自己
@@ -64,26 +65,26 @@ Vote Request 接受者实现：
 Leader 遵循的原则：
   *  一旦成为Leader, 发送心跳给所有的server，防止选举超时
   * 收到client请求，追加entry 到本地日志，等状态机应用以后再回复client
-  * 如果 last log 索引>= nextIndex ,发送以nextIndex开始的AppendEntries RPC
+  * 如果 last log 索引 >= nextIndex ,发送以nextIndex开始的AppendEntries RPC
     - 成功，更新follower对应的 nextIndex和matchIndex
     - 由于日志不一致导致失败，则减小nextIndex并重试,找到最近一致log
-  * 存在一个N> commit index, 且大多数的matchIndex[i]>=N并且log[N].term==currentTerm
+  * 存在一个N > commit index, 且大多数的matchIndex[i]>=N并且log[N].term==currentTerm
     将commitIndex = N  
 ```
 
-## 选举约束
+## 选举安全约束
 * (lastLogTerm,lastLogIndex) 而元组比较
   - up-to-date: 保证包含所有已提交的log entry
-## log 复制和提交约束
+## log 复制和提交安全约束
 * 不能依靠绝大多数策略提交非自己任期内的log entry？
   会出现log 覆盖的情况，https://juejin.im/post/5ce7be0fe51d45775c73dc57
 
 
-异常情况：
-1. Split选举
-2. Leader 或者 follower crash 问题
-3. 非自己任期内的log entry是否成功提交，是不确定的
-4. follower match并回退log优化
-5. 为什么需要 preVote？
-   假设没有preVote,网络隔离后的server 会有一个很大的term，网络恢复后，会导致其它节点变为follower开始选举，
-   但日志不是最新的，不会成为新Leader。为避免网络分区节点重新加入集群，引起无效的Election。
+## 异常情况：
+  1. Split选举
+  2. Leader 或者 follower crash 问题
+  3. 非自己任期内的log entry是否成功提交，是不确定的
+  4. follower match并回退log优化
+  5. 为什么需要 preVote？
+     假设没有preVote,网络隔离后的server 会有一个很大的term，网络恢复后，会导致其它节点变为follower开始选举，
+     但它的日志不是最新的，不会成为新Leader。为避免网络分区节点重新加入集群，引起无效的Election。

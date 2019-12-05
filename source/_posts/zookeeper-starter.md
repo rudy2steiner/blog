@@ -59,7 +59,7 @@ ZAB 算法的详细解释不是本文的重点，但只有理解了ZAB算法，�
        - 本节点最大的Propse(提议)的id
        - 逻辑时钟（logicalclock），选举计数器
        - 节点选举状态(初始值LOOKING)
-       - Propse的任期(Epoch),每个任期内的Leader对应唯一值
+       - Proposal的任期(Epoch),每个任期内的Leader对应唯一值
        - 验证配置QuorumVerifier
 
     每个Peer有两个收发消息的线程：WokerSender、WokerReceiver。其中Epoch非常重要,发生变化时会持久化到文件中，每次恢复从文件读取。

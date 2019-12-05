@@ -39,8 +39,10 @@ RequestVote RPC{
 }
 Vote Request 接受者实现：
  * 回复 false if term < currentTerm
- * 如果没有给任何选选者投票且候选者log不落后于自己的日志，true
+ * 如果没有给任何选选者投票且候选者log不落后于自己的日志（），true
 ```
+
+遵循的规则
 ```
  所有Servers遵循的规则：
   * if commitIndex > lastApplied,更新lastApplied并应用日志到状态机
@@ -52,7 +54,7 @@ Vote Request 接受者实现：
 
  候选人遵循的规则：
   * 在和候选人交流和启动选举时，
-   - currentTerm 自增
+   - currentTerm自增
    - 投票给自己
    - 重置election timer
    - 发送 RequestVote RPCs给所有的server
@@ -70,15 +72,18 @@ Leader 遵循的原则：
 ```
 
 ## 选举约束
-* (term,lastLogIndex) 而元组比较
+* (lastLogTerm,lastLogIndex) 而元组比较
+  - up-to-date: 保证包含所有已提交的log entry
 ## log 复制和提交约束
-* 不能提交非自己任期内的log entry？
-
-
+* 不能依靠绝大多数策略提交非自己任期内的log entry？
+  会出现log 覆盖的情况，https://juejin.im/post/5ce7be0fe51d45775c73dc57
 
 
 异常情况：
 1. Split选举
 2. Leader 或者 follower crash 问题
-3. 不提交非自己任期内的log entry
+3. 非自己任期内的log entry是否成功提交，是不确定的
 4. follower match并回退log优化
+5. 为什么需要 preVote？
+   假设没有preVote,网络隔离后的server 会有一个很大的term，网络恢复后，会导致其它节点变为follower开始选举，
+   但日志不是最新的，不会成为新Leader。为避免网络分区节点重新加入集群，引起无效的Election。

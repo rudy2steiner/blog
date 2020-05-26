@@ -1,19 +1,20 @@
 ---
-title: Zookeeper源码分析
+title: Zookeeper server 入门
 date: 2019-10-27 22:24:09
+toc: true
 tags: [ZAB,zookeeper]
 ---
-Zookeeper 是一个容错的分布式协调服务通常用于维护配置信息、服务发现、Leader选举等场景。采用ZAB(Zookeeper atomic broadcast)共识算法使得服务集群高可用，例如一个5节点的服务集群最多可以允许2个节点不可用(宕机、网络隔离)，集群仍能对外提供服务。
-ZAB协议主要有四个阶段(ZabState)：ELECTION > DISCOVERY > SYNCHRONIZATION > BROADCAST。Zookeeper实际使用三阶段：Fast Leader Election > Recovery > Broadcast，集群节点有四种角色(ServerState)：
-* LOOKING (初始角色)
-* FOLLOWING（follower）
-* LEADING (leader)
-* OBSERVING (observer)
+Zookeeper 是一个容错的分布式协调服务通常用于维护配置信息、服务发现、Leader选举等场景。采用ZAB(Zookeeper atomic broadcast)共识算法使得服务集群高可用,例如一个5节点的服务集群最多可以允许2个节点不可用(宕机、网络隔离)，集群仍能对外提供服务。
+ZAB协议主要有四个阶段(ZabState)：ELECTION > DISCOVERY > SYNCHRONIZATION > BROADCAST。Zookeeper实际使用三阶段:Fast Leader Election > Recovery > Broadcast,集群节点有四种状态(ServerState)：
+  * LOOKING(初始状态)
+  * FOLLOWING(follower）
+  * LEADING(leader)
+  * OBSERVING(observer)
 
-理解zookeeper的实现主可以顺着集群中节点角色及协议状态的转化过程，梳理出大致的。Zookeeper有单例和集群两种模式,本文基于3.5.5版本源码，从实现的角度介绍Zookeeper集群模式的程序入口、选举、崩溃恢复、广播等内容。
+理解zookeeper的实现主可以顺着集群中节点角色及协议状态的转化过程,梳理出大致脉络。Zookeeper有单例和集群两种模式,本文基于3.5.5版本源码，从实现的角度介绍Zookeeper集群模式的程序入口、选举、崩溃恢复、广播等内容。
 
 ## ZK集群模式（QuorumPeerMain）
-Zookeeper集群模式的入口类是QuorumPeerMain，主要完成两件事：配置解析及节点初始化并启动(QuorumPeer)。梳理配置解析对理解Zookeeper的整体实现有很大的帮助，比如Zookeeper使用了哪几类端口，作用分别是什么？
+Zookeeper集群模式的入口类是QuorumPeerMain,主要完成两件事:配置解析及节点初始化并启动(QuorumPeer)。梳理配置解析对理解Zookeeper的整体实现有很大的帮助,比如Zookeeper使用了哪几类端口,作用分别是什么？
 ### 配置解析
 
 配置类QuorumPeerConfig里的配置项主要包含：
@@ -72,7 +73,7 @@ ZAB 算法的详细解释不是本文的重点，但只有理解了ZAB算法，�
    将收到的Notification加入选票统计，Peer Proposal一旦有更新，则广播自己的Proposal。判断选票是否达到了大多数，是则根据选举结果改变节点状态（LEADING or FOLLOWING），lookForLeader结束。
 
 
-## 崩溃恢复（数据同步）
+## 崩溃恢复(数据同步)
 崩溃恢复主要关注Leader是如何处理各种异常情况下，数据的同步。数据同步的目的是为了保证副本状态的一致性，必须满足两个性质：
 * 在任意副本上已提交的事务(lastProcessZxid)也必须在其余副本提交，通过SNAP和DIFF完成
 * 没有提交的事务应当被废除，保证没有节点提交该事务，通过TRUNC来完成
@@ -118,7 +119,8 @@ ZAB 算法的详细解释不是本文的重点，但只有理解了ZAB算法，�
 ## 原子广播
 
 事务请求采用Two-phased Commit，Zookeeper的写请求都会在Leader上以事务的方式提交，follower收到写请求会转发给Leader。
-### LeaderZookeeperServer处理客户端的请求，采用一系列Processor：
+### LeaderZookeeperServer响应
+  采用一系列Processor
   1. LeaderRequesetProcessor
   2. RrepRequestProcessor: 分配zxid
   3. ProposalRequestProcessor: 发起事务Proposal
@@ -130,7 +132,6 @@ ZAB 算法的详细解释不是本文的重点，但只有理解了ZAB算法，�
      * toBeApplied:将事务请求添加到toBeApplied队列（已达成大多数，但还未实际执行事务操作）
      * 发送Leader.COMMIT给所有的Followers
      * 并通知observer
-
   4. CommitProcessor
     * 非事务的request直接next processor
     * 事务操作，提交最早的事务
@@ -140,7 +141,8 @@ ZAB 算法的详细解释不是本文的重点，但只有理解了ZAB算法，�
     * addCommittedProposal
     * 响应客户端的请求
 
-### FollowerZookeeperServer处理客户端请求，采用一系列Processor:
+### FollowerZookeeperServer响应
+ 采用一系列Processor:
   1. FollowerRequestProcessor
   2. CommitProcessor
   3. FinalRequestProcessor 专门用于处理Leader的事务日志请求
@@ -150,3 +152,18 @@ ZAB 算法的详细解释不是本文的重点，但只有理解了ZAB算法，�
 ## Q&A
 1. Zookeeper 是如何区分未提交的事务呢？
    在Leader写入事务（zxid）日志，在向follower发起Proposal前宕机，正常的followers选出新leader。旧Leader节点恢复之后，发起数据同步，新Leader会发现不包含follower上的lastProcessZxid，Leader会向follower发送TRUNC。
+2. ZAB 和Paxos的异同？
+ https://cwiki.apache.org/confluence/display/ZOOKEEPER/Zab+vs.+Paxos
+    * quorum
+    * leader proposal
+    * Proposal epoche
+    * Zab主要针对主-备系统设计
+    * Paxos为状态机复制而设计
+3. ZAB 和 Raft 异同？
+    * Strong Leader
+    * 新Leader不需要是有最新数据的节点
+    
+3. 相关论文
+
+  * ZooKeeper’s atomic broadcast protocol: Theory and practice
+  * Zab: High-performance broadcast for primary-backup systems

@@ -3,7 +3,7 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 让消息多飞一会
+title: Rudy Steiner's Blog
 subtitle:
 description:
 keywords:
@@ -14,7 +14,7 @@ timezone: Asia/Shanghai
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: https://rudy2steiner.github.io
-root: /rudy2steiner.github.io
+root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 

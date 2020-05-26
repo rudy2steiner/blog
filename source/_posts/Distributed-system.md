@@ -1,6 +1,7 @@
 ---
 title: Distributed System Basics
 draft: true
+toc: true 
 date: 2019-10-13 22:23:49
 tags: [Distributed theory,CAP定理]
 ---

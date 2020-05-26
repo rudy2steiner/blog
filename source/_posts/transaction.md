@@ -1,12 +1,9 @@
 ---
 title: Distributed transaction
 tags: XA
+toc: true
 date: 2019-03-18 23:46:59
 ---
-
-
-2PC、3PC
-===
 分布式事务中必须处理超时、节点(coordinator、participate)宕机、节点宕机恢复（fail-recover）、网络分区等异常情况。[2PC和3PC基本概念][1]
 
 ## 基本概念

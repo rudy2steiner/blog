@@ -1,5 +1,6 @@
 ---
 title: 从Hotspot对象实例化过程，理解类加载
+toc: true
 tags:
   - JVM
   - 类加载
@@ -14,7 +15,7 @@ Java 对象的实例化JVM都做了那些事情？在日常编写Java项目的�
 面对Hotspot如此庞大的工程，并且C++语言对大多数人也不太熟悉，项目的入口在哪里？这个我目前也不太清楚；我最关心的是什么？main、Launcher、new关键字大概是我最想了解的，类加载恰好可以串联它们。第一篇JVM相关的博客，看书和写博客都是都是慢长的过程（个人感觉），有些东西不值得看，也不值得写，JVM属于另外一类，那就抽空看，再慢慢写。
 
 
-# 类加载
+## 类加载
 
 一个class文件，需要依次完成加载、链接、初始化三个阶段，才可以在JVM中正常的使用。如创建实例，访问类的静态方法和域。
 主要步骤如下：
@@ -108,7 +109,7 @@ instanceKlassHandle ClassFileParser::parseClassFile(Symbol* name,
 
 ```
 
-# 类的实例化
+## 类的实例化
 
   从虚拟机层面来看，所有的Java构造函数都显示为具有特殊名称[ &lt;init&gt; ](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-2.html)的实例初始化方法。Hotspot中调用&lt;init&gt;的代码如下：
 

@@ -79,8 +79,7 @@ https://blog.linkerd.io/2016/03/16/beyond-round-robin-load-balancing-for-latency
 26. Nvme&SSD
 27. Design Pattern
 * Factory
-28. Megastore、paxos、chubby、Quorum机制、bigtable
-分布式存储、复制
+28. Megastore、paxos、chubby、Quorum机制、bigtable分布式存储、复制
 29. ReentrantLock& Condition
 30. zookeeper ZAB 和fast PAXOS
 31. http://alvaro-videla.com/2015/12/learning-about-distributed-systems.html
@@ -91,3 +90,4 @@ The reactor design pattern is an event handling pattern for handling service req
 反应器设计模式是能够将一个或者多个服务请求并发地派发给服务处理器的事件处理模式
 34. JMX(java management extensions)
 35. Spring
+36. OpenResty
